@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface GameElementProps {
   emoji: string;
   label: string;
