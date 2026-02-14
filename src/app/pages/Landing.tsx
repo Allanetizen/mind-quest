@@ -1,6 +1,6 @@
-import logo from 'figma:asset/6323cd97da81e4ad097bcce06eaf2ddad21cc0bf.png';
+import logo from '../../assets/6323cd97da81e4ad097bcce06eaf2ddad21cc0bf.png';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
 import { PixelButton } from '../components/PixelButton';
 import { GameElement } from '../components/GameElement';

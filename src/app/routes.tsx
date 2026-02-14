@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
 import { Landing } from "./pages/Landing";
 import { PetSelection } from "./pages/PetSelection";
 import { Auth } from "./pages/Auth";
