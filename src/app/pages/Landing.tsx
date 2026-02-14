@@ -1,5 +1,5 @@
 import logo from '../../assets/logo.png';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
 import { PixelButton } from '../components/PixelButton';
@@ -7,14 +7,49 @@ import { GameElement } from '../components/GameElement';
 import { motion } from 'motion/react';
 
 export function Landing() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
+  useEffect(() => {
+    const senderId = '384d9197486881';
+    const win = window as Window & { sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number } };
+
+    if (!win.sender) {
+      win.sender = function (...args: unknown[]) {
+        const senderFn = win.sender;
+        if (!senderFn) {
+          return;
+        }
+        senderFn.q = senderFn.q || [];
+        senderFn.q.push(args);
+      };
+      win.sender.l = 1 * new Date();
+    }
+
+    const initSender = () => {
+      if (typeof win.sender === 'function') {
+        win.sender(senderId);
+      }
+    };
+
+    const existingScript = document.querySelector(
+      'script[src="https://cdn.sender.net/accounts_resources/universal.js"]'
+    );
+
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
+      script.onload = initSender;
+      const firstScript = document.getElementsByTagName('script')[0];
+      if (firstScript?.parentNode) {
+        firstScript.parentNode.insertBefore(script, firstScript);
+      } else {
+        document.head.appendChild(script);
+      }
+    } else {
+      initSender();
+    }
+  }, []);
 
   const handleGetStarted = () => {
     navigate('/choose-pet');
@@ -204,32 +239,11 @@ export function Landing() {
                   Be first in line ✨
                 </p>
                 
-                {!submitted ? (
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      required
-                      className="w-full px-6 py-4 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font"
-                    />
-                    
-                    <PixelButton type="submit">
-                      Join Waitlist
-                    </PixelButton>
-                    
-                    <p className="text-xs text-[#9F7AEA] mt-4">
-                      Don't worry — we don't spam. We protect your mental peace.
-                    </p>
-                  </form>
-                ) : (
-                  <div className="py-8">
-                    <div className="text-5xl mb-4">🎉</div>
-                    <p className="text-xl text-[#553C9A] pixel-font">You're in!</p>
-                    <p className="text-[#6B46C1] text-sm mt-2">Talk soon ✨</p>
-                  </div>
-                )}
+                <div
+                  style={{ textAlign: 'left' }}
+                  className="sender-form-field sender-embed"
+                  data-sender-form-id="dR6JzL"
+                ></div>
               </PixelCard>
             </motion.div>
           </div>
