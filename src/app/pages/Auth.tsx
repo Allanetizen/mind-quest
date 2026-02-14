@@ -25,19 +25,30 @@ export function Auth() {
       win.sender.l = 1 * new Date();
     }
 
-    if (!document.querySelector('script[src="https://cdn.sender.net/accounts_resources/universal.js"]')) {
+    const initSender = () => {
+      if (typeof win.sender === 'function') {
+        win.sender(senderId);
+      }
+    };
+
+    const existingScript = document.querySelector(
+      'script[src="https://cdn.sender.net/accounts_resources/universal.js"]'
+    );
+
+    if (!existingScript) {
       const script = document.createElement('script');
       script.async = true;
       script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
+      script.onload = initSender;
       const firstScript = document.getElementsByTagName('script')[0];
       if (firstScript?.parentNode) {
         firstScript.parentNode.insertBefore(script, firstScript);
       } else {
         document.head.appendChild(script);
       }
+    } else {
+      initSender();
     }
-
-    win.sender(senderId);
   }, []);
 
   return (
