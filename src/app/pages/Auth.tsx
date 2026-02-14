@@ -15,7 +15,12 @@ export function Auth() {
 
     if (!win.sender) {
       win.sender = function (...args: unknown[]) {
-        (win.sender?.q = win.sender?.q || []).push(args);
+        const senderFn = win.sender;
+        if (!senderFn) {
+          return;
+        }
+        senderFn.q = senderFn.q || [];
+        senderFn.q.push(args);
       };
       win.sender.l = 1 * new Date();
     }
