@@ -1,5 +1,4 @@
 import logo from '../../assets/logo.png';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
 import { PixelButton } from '../components/PixelButton';
@@ -8,48 +7,6 @@ import { motion } from 'motion/react';
 
 export function Landing() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const senderId = '384d9197486881';
-    const win = window as Window & { sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number } };
-
-    if (!win.sender) {
-      win.sender = function (...args: unknown[]) {
-        const senderFn = win.sender;
-        if (!senderFn) {
-          return;
-        }
-        senderFn.q = senderFn.q || [];
-        senderFn.q.push(args);
-      };
-      win.sender.l = 1 * new Date();
-    }
-
-    const initSender = () => {
-      if (typeof win.sender === 'function') {
-        win.sender(senderId);
-      }
-    };
-
-    const existingScript = document.querySelector(
-      'script[src="https://cdn.sender.net/accounts_resources/universal.js"]'
-    );
-
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
-      script.onload = initSender;
-      const firstScript = document.getElementsByTagName('script')[0];
-      if (firstScript?.parentNode) {
-        firstScript.parentNode.insertBefore(script, firstScript);
-      } else {
-        document.head.appendChild(script);
-      }
-    } else {
-      initSender();
-    }
-  }, []);
 
   const handleGetStarted = () => {
     navigate('/choose-pet');
@@ -220,32 +177,6 @@ export function Landing() {
                 {feature}
               </motion.div>
             ))}
-          </div>
-        </section>
-
-        {/* Signup */}
-        <section className="px-6 py-12 md:py-16">
-          <div className="max-w-lg mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5 }}
-            >
-              <PixelCard color="gradient" className="p-8 md:p-12 text-center">
-                <h2 className="text-2xl md:text-3xl mb-3 text-[#553C9A] pixel-font">
-                  Join the Quest
-                </h2>
-                <p className="text-[#6B46C1] mb-8 text-sm">
-                  Be first in line ✨
-                </p>
-                
-                <div
-                  style={{ textAlign: 'left' }}
-                  className="sender-form-field sender-embed"
-                  data-sender-form-id="dR6JzL"
-                ></div>
-              </PixelCard>
-            </motion.div>
           </div>
         </section>
 
