@@ -1,7 +1,7 @@
 
-  # Design MindQuest Landing Screen (Community)
+  # Design MindQuest Landing Screen
 
-  This is a code bundle for Design MindQuest Landing Screen (Community). The original project is available at https://www.figma.com/design/dSDEIbGGTvUkMmP05RFlYk/Design-MindQuest-Landing-Screen--Community-.
+  This is a code bundle for Design MindQuest Landing Screen. The original project is available at https://www.figma.com/design/Ymwb7kNTxhpiafU2kwase1/Design-MindQuest-Landing-Screen.
 
   ## Running the code
 

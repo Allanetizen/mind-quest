@@ -1,7 +1,5 @@
-import React, { type ReactNode } from 'react';
-
 interface PixelButtonProps {
-  children: ReactNode;
+  children: React.ReactNode;
   onClick?: () => void;
   type?: 'button' | 'submit';
 }
