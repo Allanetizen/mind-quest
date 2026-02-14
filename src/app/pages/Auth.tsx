@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { PixelCard } from '../components/PixelCard';
@@ -8,48 +7,6 @@ import { ArrowLeft } from 'lucide-react';
 export function Auth() {
   const navigate = useNavigate();
   const { pet } = useUser();
-
-  useEffect(() => {
-    const senderId = '384d9197486881';
-    const win = window as Window & { sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number } };
-
-    if (!win.sender) {
-      win.sender = function (...args: unknown[]) {
-        const senderFn = win.sender;
-        if (!senderFn) {
-          return;
-        }
-        senderFn.q = senderFn.q || [];
-        senderFn.q.push(args);
-      };
-      win.sender.l = 1 * new Date();
-    }
-
-    const initSender = () => {
-      if (typeof win.sender === 'function') {
-        win.sender(senderId);
-      }
-    };
-
-    const existingScript = document.querySelector(
-      'script[src="https://cdn.sender.net/accounts_resources/universal.js"]'
-    );
-
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
-      script.onload = initSender;
-      const firstScript = document.getElementsByTagName('script')[0];
-      if (firstScript?.parentNode) {
-        firstScript.parentNode.insertBefore(script, firstScript);
-      } else {
-        document.head.appendChild(script);
-      }
-    } else {
-      initSender();
-    }
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#DDD6F3] relative overflow-hidden flex items-center justify-center">
@@ -104,11 +61,9 @@ export function Auth() {
               </p>
             </div>
 
-            <div
-              style={{ textAlign: 'left' }}
-              className="sender-form-field sender-embed"
-              data-sender-form-id="dR6JzL"
-            ></div>
+            <p className="text-center text-[#6B46C1] text-sm">
+              Head back to the landing page to start your journey.
+            </p>
           </PixelCard>
         </motion.div>
       </div>

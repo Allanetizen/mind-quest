@@ -1,4 +1,5 @@
 import logo from '../../assets/logo.png';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
 import { PixelButton } from '../components/PixelButton';
@@ -7,6 +8,48 @@ import { motion } from 'motion/react';
 
 export function Landing() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const senderId = '384d9197486881';
+    const win = window as Window & { sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number } };
+
+    if (!win.sender) {
+      win.sender = function (...args: unknown[]) {
+        const senderFn = win.sender;
+        if (!senderFn) {
+          return;
+        }
+        senderFn.q = senderFn.q || [];
+        senderFn.q.push(args);
+      };
+      win.sender.l = 1 * new Date();
+    }
+
+    const initSender = () => {
+      if (typeof win.sender === 'function') {
+        win.sender(senderId);
+      }
+    };
+
+    const existingScript = document.querySelector(
+      'script[src="https://cdn.sender.net/accounts_resources/universal.js"]'
+    );
+
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
+      script.onload = initSender;
+      const firstScript = document.getElementsByTagName('script')[0];
+      if (firstScript?.parentNode) {
+        firstScript.parentNode.insertBefore(script, firstScript);
+      } else {
+        document.head.appendChild(script);
+      }
+    } else {
+      initSender();
+    }
+  }, []);
 
   const handleGetStarted = () => {
     navigate('/choose-pet');
@@ -81,13 +124,16 @@ export function Landing() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
+            className="w-full max-w-lg"
           >
-            <button
-              onClick={handleGetStarted}
-              className="px-8 py-3 bg-[#6B46C1] hover:bg-[#553C9A] text-white border-4 border-[#553C9A] hover:border-[#44337A] transition-all duration-150 active:translate-y-1 pixel-font shadow-[4px_4px_0px_0px_rgba(68,51,122,1)] hover:shadow-[2px_2px_0px_0px_rgba(68,51,122,1)] active:shadow-none mb-12"
-            >
-              🎮 Start Your Quest
-            </button>
+            <div className="mb-4 text-[#6B46C1] text-sm">
+              Enter your email to begin ✨
+            </div>
+            <div
+              style={{ textAlign: 'left' }}
+              className="sender-form-field sender-embed"
+              data-sender-form-id="dR6JzL"
+            ></div>
           </motion.div>
 
           {/* Visual Game Elements */}
