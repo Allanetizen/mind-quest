@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { PixelCard } from '../components/PixelCard';
 import { PixelButton } from '../components/PixelButton';
@@ -12,6 +12,32 @@ export function Auth() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const { setUser, pet } = useUser();
+
+  useEffect(() => {
+    const senderId = '384d9197486881';
+    const win = window as Window & { sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number } };
+
+    if (!win.sender) {
+      win.sender = function (...args: unknown[]) {
+        (win.sender?.q = win.sender?.q || []).push(args);
+      };
+      win.sender.l = 1 * new Date();
+    }
+
+    if (!document.querySelector('script[src="https://cdn.sender.net/accounts_resources/universal.js"]')) {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
+      const firstScript = document.getElementsByTagName('script')[0];
+      if (firstScript?.parentNode) {
+        firstScript.parentNode.insertBefore(script, firstScript);
+      } else {
+        document.head.appendChild(script);
+      }
+    }
+
+    win.sender(senderId);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
