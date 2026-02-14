@@ -1,17 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { PixelCard } from '../components/PixelCard';
-import { PixelButton } from '../components/PixelButton';
 import { useUser } from '../context/UserContext';
 import { ArrowLeft } from 'lucide-react';
 
 export function Auth() {
-  const [mode, setMode] = useState<'login' | 'signup'>('signup');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { setUser, pet } = useUser();
+  const { pet } = useUser();
 
   useEffect(() => {
     const senderId = '384d9197486881';
@@ -38,12 +34,6 @@ export function Auth() {
 
     win.sender(senderId);
   }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setUser({ email });
-    navigate('/journal');
-  };
 
   return (
     <div className="min-h-screen bg-[#DDD6F3] relative overflow-hidden flex items-center justify-center">
@@ -91,52 +81,18 @@ export function Auth() {
                 </motion.div>
               )}
               <h1 className="text-2xl md:text-3xl text-[#553C9A] pixel-font mb-2">
-                {mode === 'login' ? 'Welcome Back!' : 'Start Your Journey'}
+                Start Your Journey
               </h1>
               <p className="text-[#6B46C1] text-sm">
-                {mode === 'login' 
-                  ? `${pet?.name || 'Your pet'} missed you!` 
-                  : `${pet?.name || 'Your pet'} is ready to meet you!`}
+                {pet?.name || 'Your pet'} is ready to meet you!
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
-                  required
-                  className="w-full px-6 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1]"
-                />
-              </div>
-
-              <div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  required
-                  className="w-full px-6 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1]"
-                />
-              </div>
-
-              <PixelButton type="submit">
-                {mode === 'login' ? 'Log In' : 'Sign Up'} ✨
-              </PixelButton>
-
-              <button
-                type="button"
-                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                className="w-full text-center text-[#9F7AEA] hover:text-[#6B46C1] text-sm transition-colors"
-              >
-                {mode === 'login' 
-                  ? "Don't have an account? Sign up" 
-                  : "Already have an account? Log in"}
-              </button>
-            </form>
+            <div
+              style={{ textAlign: 'left' }}
+              className="sender-form-field sender-embed"
+              data-sender-form-id="dR6JzL"
+            ></div>
           </PixelCard>
         </motion.div>
       </div>
