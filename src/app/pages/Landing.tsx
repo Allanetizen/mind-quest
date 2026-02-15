@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
 import { GameElement } from '../components/GameElement';
 import { motion } from 'motion/react';
+import { trackEvent } from '../utils/analytics';
 
 const SENDER_ACCOUNT_ID = '384d9197486881';
 const SENDER_FORM_ID = 'dR6JzL';
@@ -156,6 +157,7 @@ export function Landing() {
                         setLoading(false);
                         return;
                       }
+                      trackEvent('email_submitted');
                       setSubmitted(true);
                       navigate('/quiz', { state: { email: emailValue } });
                     } catch {

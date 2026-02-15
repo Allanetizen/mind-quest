@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { PixelCard } from '../components/PixelCard';
 import { useUser } from '../context/UserContext';
+import { trackEvent } from '../utils/analytics';
 
 const QUESTIONS = [
   {
@@ -95,6 +96,16 @@ export function Quiz() {
   const isQuestionStep = step < QUESTIONS.length;
   const currentQuestion = QUESTIONS[step];
 
+  useEffect(() => {
+    trackEvent('quiz_started');
+  }, []);
+
+  useEffect(() => {
+    if (result) {
+      trackEvent('quiz_completed', { companion: result.id });
+    }
+  }, [result]);
+
   const handleAnswer = (value: string) => {
     const newAnswers = [...answers, value];
     setAnswers(newAnswers);
@@ -108,6 +119,7 @@ export function Quiz() {
 
   const handleStartQuest = () => {
     if (result) {
+      trackEvent('quest_started', { companion: result.id });
       setPet({
         id: result.id,
         name: result.name,
