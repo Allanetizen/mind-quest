@@ -190,6 +190,10 @@
     width: 100%;
   }
 
+  .landing-sender-form {
+    min-height: 140px;
+  }
+
   .sender-embed form {
     display: flex;
     flex-direction: column;

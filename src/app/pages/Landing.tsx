@@ -1,143 +1,220 @@
 import logo from '../../assets/logo.png';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
-import { PixelButton } from '../components/PixelButton';
 import { GameElement } from '../components/GameElement';
 import { motion } from 'motion/react';
 
+const SENDER_ACCOUNT_ID = '384d9197486881';
+const SENDER_FORM_ID = 'dR6JzL';
+const SENDER_SCRIPT_BASE = 'https://cdn.sender.net/accounts_resources/universal.js';
+
+declare global {
+  interface Window {
+    sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number };
+    senderFormsLoaded?: boolean;
+    senderForms?: { render: (forms: string | string[], config?: { onRender?: (formId: string) => void }) => void };
+    onSenderReady?: () => void;
+  }
+}
+
+const SUBSCRIBE_API = import.meta.env.VITE_SUBSCRIBE_API_URL || '/api/subscribe';
+
 export function Landing() {
+  const [email, setEmail] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const senderId = '384d9197486881';
-    const win = window as Window & { sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number } };
+    const win = window;
 
     if (!win.sender) {
       win.sender = function (...args: unknown[]) {
-        const senderFn = win.sender;
-        if (!senderFn) {
-          return;
+        const fn = win.sender;
+        if (fn) {
+          fn.q = fn.q || [];
+          fn.q.push(args);
         }
-        senderFn.q = senderFn.q || [];
-        senderFn.q.push(args);
       };
       win.sender.l = 1 * new Date();
     }
 
-    const initSender = () => {
-      if (typeof win.sender === 'function') {
-        win.sender(senderId);
+    const renderForm = () => {
+      if (win.senderForms && typeof win.senderForms.render === 'function') {
+        win.senderForms.render([SENDER_FORM_ID], {
+          onRender() {
+            // Form is now in the DOM and can collect email
+          },
+        });
       }
     };
 
-    const existingScript = document.querySelector(
-      'script[src="https://cdn.sender.net/accounts_resources/universal.js"]'
-    );
+    win.onSenderReady = () => {
+      if (typeof win.sender === 'function') {
+        win.sender(SENDER_ACCOUNT_ID);
+      }
+      if (win.senderFormsLoaded) {
+        renderForm();
+      } else {
+        window.addEventListener('onSenderFormsLoaded', renderForm);
+      }
+    };
 
-    if (!existingScript) {
+    const scriptUrl = `${SENDER_SCRIPT_BASE}?explicit=true&onload=onSenderReady`;
+    const existing = document.querySelector(`script[src*="${SENDER_SCRIPT_BASE}"]`);
+
+    if (!existing) {
       const script = document.createElement('script');
       script.async = true;
-      script.src = 'https://cdn.sender.net/accounts_resources/universal.js';
-      script.onload = initSender;
-      const firstScript = document.getElementsByTagName('script')[0];
-      if (firstScript?.parentNode) {
-        firstScript.parentNode.insertBefore(script, firstScript);
-      } else {
-        document.head.appendChild(script);
-      }
-    } else {
-      initSender();
+      script.src = scriptUrl;
+      const first = document.getElementsByTagName('script')[0];
+      (first?.parentNode || document.head).appendChild(script);
+    } else if (win.onSenderReady) {
+      win.onSenderReady();
     }
-  }, []);
 
-  const handleGetStarted = () => {
-    navigate('/choose-pet');
-  };
+    return () => {
+      window.removeEventListener('onSenderFormsLoaded', renderForm);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#DDD6F3] relative overflow-hidden">
-      {/* Pixel Grid Background Pattern */}
-      <div className="absolute inset-0 opacity-10" style={{
-        backgroundImage: `
-          linear-gradient(#6B46C1 1px, transparent 1px),
-          linear-gradient(90deg, #6B46C1 1px, transparent 1px)
-        `,
-        backgroundSize: '20px 20px'
-      }}></div>
-
-      {/* Floating Pixel Elements */}
-      <motion.div 
-        className="absolute top-20 left-10 opacity-30"
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="w-8 h-8 bg-[#9F7AEA]" style={{ imageRendering: 'pixelated' }}></div>
-      </motion.div>
-      <motion.div 
-        className="absolute top-40 right-20 opacity-20"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="w-6 h-6 bg-[#B794F6]" style={{ imageRendering: 'pixelated' }}></div>
-      </motion.div>
-      <motion.div 
-        className="absolute bottom-40 left-20 opacity-25"
-        animate={{ y: [0, -15, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <div className="w-10 h-10 bg-[#E9D8FD]" style={{ imageRendering: 'pixelated' }}></div>
-      </motion.div>
+      <div
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: `linear-gradient(#6B46C1 1px, transparent 1px), linear-gradient(90deg, #6B46C1 1px, transparent 1px)`,
+          backgroundSize: '20px 20px',
+        }}
+      />
 
       <div className="relative z-10">
-        {/* Hero */}
-        <section className="px-6 py-12 md:py-16 flex flex-col items-center text-center max-w-5xl mx-auto">
-          <motion.img 
-            src={logo} 
-            alt="MindQuest" 
-            className="w-40 h-40 md:w-56 md:h-56 mb-8"
+        {/* Hero: form is the entrance */}
+        <section className="px-6 pt-10 pb-12 md:pt-14 md:pb-16 flex flex-col items-center text-center max-w-2xl mx-auto">
+          <motion.img
+            src={logo}
+            alt="MindQuest"
+            className="w-32 h-32 md:w-40 md:h-40 mb-6"
             style={{ imageRendering: 'pixelated' }}
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
           />
-          
-          <motion.h1 
-            className="text-4xl md:text-6xl mb-4 text-[#553C9A] tracking-tight pixel-font"
-            initial={{ opacity: 0, y: 20 }}
+          <motion.h1
+            className="text-3xl md:text-5xl mb-2 text-[#553C9A] tracking-tight pixel-font"
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.2 }}
           >
-            Reflect a little.<br/>Grow a lot.
+            Reflect a little.<br />Grow a lot.
           </motion.h1>
-          
-          <motion.p 
-            className="text-lg md:text-xl text-[#6B46C1] max-w-xl mb-8"
+          <motion.p
+            className="text-[#6B46C1] mb-8 text-base md:text-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.35 }}
           >
             Guided reflections. Zero stress.
           </motion.p>
 
+          {/* Email form – main entrance */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="w-full max-w-lg"
+            className="w-full"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
           >
-            <div className="mb-4 text-[#6B46C1] text-sm">
-              Enter your email to begin ✨
-            </div>
-            <div
-              style={{ textAlign: 'left' }}
-              className="sender-form-field sender-embed"
-              data-sender-form-id="dR6JzL"
-            ></div>
+            <PixelCard color="gradient" className="p-6 md:p-8 text-center">
+              <p className="text-[#553C9A] pixel-font text-sm md:text-base mb-4">
+                Enter your email to begin ✨
+              </p>
+              {!submitted ? (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setError(null);
+                    setLoading(true);
+                    const emailValue = email.trim();
+                    try {
+                      const res = await fetch(SUBSCRIBE_API, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Accept: 'application/json',
+                        },
+                        body: JSON.stringify({
+                          email: emailValue,
+                          ...(firstname.trim() && { firstname: firstname.trim() }),
+                        }),
+                      });
+                      const data = await res.json().catch(() => ({}));
+                      if (!res.ok) {
+                        setError(data.error || 'Something went wrong. Try again.');
+                        setLoading(false);
+                        return;
+                      }
+                      setSubmitted(true);
+                      navigate('/quiz', { state: { email: emailValue } });
+                    } catch {
+                      setError('Connection error. Try again.');
+                    }
+                    setLoading(false);
+                  }}
+                  className="flex flex-col gap-3 items-center"
+                >
+                  <input
+                    type="text"
+                    value={firstname}
+                    onChange={(e) => { setFirstname(e.target.value); setError(null); }}
+                    placeholder="First name (optional)"
+                    disabled={loading}
+                    className="w-full max-w-sm px-4 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font text-sm disabled:opacity-70"
+                  />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                    placeholder="your.email@example.com"
+                    required
+                    disabled={loading}
+                    className="w-full max-w-sm px-4 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font text-sm disabled:opacity-70"
+                  />
+                  {error && (
+                    <p className="text-red-600 text-xs pixel-font">{error}</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-2 bg-[#6B46C1] hover:bg-[#553C9A] text-white border-2 border-[#553C9A] pixel-font text-xs transition-colors disabled:opacity-70"
+                  >
+                    {loading ? 'Sending…' : 'Start your quest →'}
+                  </button>
+                  <p className="text-[#9F7AEA] text-[10px] leading-tight max-w-xs">
+                    By signing up you agree to receive MindQuest updates and newsletters.
+                  </p>
+                </form>
+              ) : (
+                <p className="text-[#553C9A] pixel-font text-sm mb-2">You’re in! ✨</p>
+              )}
+              {submitted && (
+                <p className="mt-4 text-[#9F7AEA] text-xs">
+                  Then take a short quiz to find your companion.
+                </p>
+              )}
+              <div
+                className="sender-form-field sender-embed landing-sender-form hidden"
+                style={{ textAlign: 'left' }}
+                data-sender-form-id={SENDER_FORM_ID}
+                aria-hidden="true"
+              />
+            </PixelCard>
           </motion.div>
 
-          {/* Visual Game Elements */}
-          <div className="grid grid-cols-3 gap-4 md:gap-8 w-full max-w-3xl mb-16">
+          {/* Game elements */}
+          <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-2xl mt-12 mb-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

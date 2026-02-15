@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Landing } from "./pages/Landing";
+import { Quiz } from "./pages/Quiz";
 import { PetSelection } from "./pages/PetSelection";
 import { Auth } from "./pages/Auth";
 import { Journal } from "./pages/Journal";
@@ -9,6 +10,10 @@ export const router = createBrowserRouter([
   {
     path: "/",
     Component: Landing,
+  },
+  {
+    path: "/quiz",
+    Component: Quiz,
   },
   {
     path: "/choose-pet",
