@@ -47,10 +47,7 @@ export function Auth() {
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  {pet.id === 'luna' && '🐱'}
-                  {pet.id === 'buddy' && '🐶'}
-                  {pet.id === 'sage' && '🦉'}
-                  {pet.id === 'spark' && '🐰'}
+                  {({ luna: '🐱', buddy: '🐶', sage: '🦉', spark: '🐰', rabbit: '🐇', bear: '🐻', turtle: '🐢', fox: '🦊' } as Record<string, string>)[pet.id] ?? '✨'}
                 </motion.div>
               )}
               <h1 className="text-2xl md:text-3xl text-[#553C9A] pixel-font mb-2">

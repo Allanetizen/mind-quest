@@ -112,10 +112,7 @@ export function FirstJournal() {
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               className="text-6xl"
             >
-              {pet.id === 'luna' && '🐱'}
-              {pet.id === 'buddy' && '🐶'}
-              {pet.id === 'sage' && '🦉'}
-              {pet.id === 'spark' && '🐰'}
+              {({ luna: '🐱', buddy: '🐶', sage: '🦉', spark: '🐰', rabbit: '🐇', bear: '🐻', turtle: '🐢', fox: '🦊' } as Record<string, string>)[pet.id] ?? '✨'}
             </motion.div>
             
             {/* Speech Bubble */}

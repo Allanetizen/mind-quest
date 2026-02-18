@@ -37,12 +37,17 @@ export function VirtualPet() {
 
   if (!pet) return null;
 
-  const petEmoji = {
+  const petEmoji: Record<string, string> = {
     luna: '🐱',
     buddy: '🐶',
     sage: '🦉',
-    spark: '🐰'
-  }[pet.id];
+    spark: '🐰',
+    rabbit: '🐇',
+    bear: '🐻',
+    turtle: '🐢',
+    fox: '🦊',
+  };
+  const emoji = petEmoji[pet.id] ?? '✨';
 
   const moodData = moodExpressions[pet.mood];
 
@@ -67,7 +72,7 @@ export function VirtualPet() {
           }}
         >
           <div className="text-8xl md:text-9xl mb-2 relative">
-            {petEmoji}
+            {emoji}
             
             {/* Mood expression overlay */}
             <motion.div

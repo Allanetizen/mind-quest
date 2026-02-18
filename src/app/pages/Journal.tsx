@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { VirtualPet } from '../components/VirtualPet';
 import { StatsBar } from '../components/StatsBar';
 import { JournalCanvas } from '../components/JournalCanvas';
 import { InsightCard } from '../components/InsightCard';
 import { LevelUpModal } from '../components/LevelUpModal';
+import { PixelCard } from '../components/PixelCard';
 import { ArrowLeft } from 'lucide-react';
+
+/** Set to false when ready to release the journal. */
+const JOURNAL_BETA_LOCKED = true;
 
 const dailyPrompts = [
   "What brought you peace today?",
@@ -177,6 +181,35 @@ export function Journal() {
     const randomPrompt = dailyPrompts[Math.floor(Math.random() * dailyPrompts.length)];
     setDailyPrompt(randomPrompt);
   };
+
+  if (JOURNAL_BETA_LOCKED) {
+    return (
+      <div className="min-h-screen bg-[#DDD6F3] flex items-center justify-center p-6">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(#6B46C1 1px, transparent 1px), linear-gradient(90deg, #6B46C1 1px, transparent 1px)`,
+            backgroundSize: '20px 20px',
+          }}
+        />
+        <div className="relative z-10 w-full max-w-md">
+          <PixelCard color="gradient" className="p-8 text-center">
+            <div className="text-4xl mb-4">🔒</div>
+            <h1 className="text-xl text-[#553C9A] pixel-font mb-2">Journal (Beta)</h1>
+            <p className="text-[#6B46C1] text-sm mb-6">
+              The journal is in beta and locked for now. We’re polishing it—check back soon!
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#6B46C1] hover:bg-[#553C9A] text-white border-4 border-[#553C9A] pixel-font text-xs transition-all"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to home
+            </Link>
+          </PixelCard>
+        </div>
+      </div>
+    );
+  }
 
   if (!pet || !user) {
     return (

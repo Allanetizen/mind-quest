@@ -16,10 +16,7 @@ export function StatsBar() {
         {/* Pet Info */}
         <div className="flex items-center gap-3">
           <div className="text-3xl">
-            {pet.id === 'luna' && '🐱'}
-            {pet.id === 'buddy' && '🐶'}
-            {pet.id === 'sage' && '🦉'}
-            {pet.id === 'spark' && '🐰'}
+            {({ luna: '🐱', buddy: '🐶', sage: '🦉', spark: '🐰', rabbit: '🐇', bear: '🐻', turtle: '🐢', fox: '🦊' } as Record<string, string>)[pet.id] ?? '✨'}
           </div>
           <div>
             <p className="text-[#553C9A] pixel-font text-sm">{pet.name}</p>
