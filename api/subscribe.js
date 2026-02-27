@@ -1,7 +1,8 @@
 /**
  * MailerLite subscription – connect API.
  * POST https://connect.mailerlite.com/api/subscribers
- * Body: { email, fields?: { name }, groups?: [group_id] }
+ * Body: { email, status?: 'active', fields?: { name }, groups?: [group_id] }
+ * status: 'active' so automations (e.g. welcome email on join group) run.
  *
  * Env (server):
  *   SUBSS                 – required. MailerLite API token (Bearer).
@@ -39,6 +40,7 @@ export default async function handler(req, res) {
 
   const data = {
     email,
+    status: 'active',
     ...(firstname && { fields: { name: firstname } }),
     groups: [groupId],
   };

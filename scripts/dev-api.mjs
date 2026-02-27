@@ -63,6 +63,7 @@ async function handleSubscribe(req, res) {
   const groupId = process.env.MAILERLITE_GROUP_ID || DEFAULT_GROUP_ID;
   const data = {
     email,
+    status: 'active',
     ...(firstname && { fields: { name: firstname } }),
     groups: [groupId],
   };
