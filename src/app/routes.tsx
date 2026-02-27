@@ -7,6 +7,9 @@ import { Auth } from "./pages/Auth";
 import { Journal } from "./pages/Journal";
 import { FirstJournal } from "./pages/FirstJournal";
 
+/** Shareable quiz path – use this URL to send someone directly to the mood/companion quiz. */
+export const QUIZ_PATH = "/quiz";
+
 export const router = createBrowserRouter([
   {
     path: "/",

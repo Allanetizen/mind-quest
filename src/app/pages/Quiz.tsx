@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { PixelCard } from '../components/PixelCard';
 import { trackEvent } from '../utils/analytics';
@@ -172,6 +173,15 @@ export function Quiz() {
       />
 
       <div className="relative z-10 px-6 py-10 max-w-xl mx-auto">
+        {/* Shareable quiz: back link so anyone opening the link can get to the main site */}
+        <div className="mb-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-[#6B46C1] hover:text-[#553C9A] pixel-font text-xs transition-colors"
+          >
+            ← MindQuest
+          </Link>
+        </div>
         {/* Progress: "Growing your companion..." (questions + result only) */}
         {(isQuestionStep || isResultStep) && (
           <div className="mb-6">
@@ -287,6 +297,12 @@ export function Quiz() {
                   <p className="text-[#6B46C1] text-sm">{result.gentlePrompt}</p>
                 </div>
 
+                <Link
+                  to="/"
+                  className="w-full block py-3 bg-[#6B46C1] hover:bg-[#553C9A] text-white border-4 border-[#553C9A] pixel-font text-xs text-center transition-all duration-150 active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(68,51,122,1)] mb-4"
+                >
+                  Go to MindQuest →
+                </Link>
                 <p className="text-[#6B46C1] text-xs text-center mb-2">Want to discover a different companion?</p>
                 <button
                   type="button"

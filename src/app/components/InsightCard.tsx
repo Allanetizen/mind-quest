@@ -54,7 +54,7 @@ export function InsightCard({ emotion, insight, xpGained, streak, onContinue }: 
             <div className="flex flex-wrap gap-2">
               {emotion.keywords.slice(0, 5).map((keyword, index) => (
                 <motion.span
-                  key={keyword}
+                  key={`${keyword}-${index}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}

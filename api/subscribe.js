@@ -1,23 +1,24 @@
 /**
- * Sender.net subscription – follows official Sender API docs.
- * POST https://api.sender.net/v2/subscribers
- * Body: { email, firstname?, groups: [group_id], trigger_automation?: boolean }
+ * MailerLite subscription – connect API.
+ * POST https://connect.mailerlite.com/api/subscribers
+ * Body: { email, fields?: { name }, groups?: [group_id] }
  *
  * Env (server):
- *   SENDER_API_TOKEN  – required. From Sender → Settings → API access tokens.
- *   SENDER_GROUP_ID   – optional. From Sender → Subscribers → Groups → open group, ID below name.
+ *   SUBSS                 – required. MailerLite API token (Bearer).
+ *   MAILERLITE_GROUP_ID   – optional. Group ID to add subscribers to (default: 180587122481170115).
  */
 
-const SENDER_SUBSCRIBERS_URL = 'https://api.sender.net/v2/subscribers';
+const MAILERLITE_SUBSCRIBERS_URL = 'https://connect.mailerlite.com/api/subscribers';
+const DEFAULT_GROUP_ID = '180587122481170115';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const token = process.env.SENDER_API_TOKEN;
+  const token = process.env.SUBSS;
   if (!token) {
-    console.error('SENDER_API_TOKEN is not set');
+    console.error('SUBSS (MailerLite API token) is not set');
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
@@ -34,17 +35,16 @@ export default async function handler(req, res) {
   }
 
   const firstname = body.firstname ? String(body.firstname).trim() : undefined;
-  const groupId = process.env.SENDER_GROUP_ID || null;
+  const groupId = process.env.MAILERLITE_GROUP_ID || DEFAULT_GROUP_ID;
 
   const data = {
     email,
-    ...(firstname && { firstname }),
-    ...(groupId && { groups: [groupId] }),
-    trigger_automation: body.trigger_automation !== false,
+    ...(firstname && { fields: { name: firstname } }),
+    groups: [groupId],
   };
 
   try {
-    const response = await fetch(SENDER_SUBSCRIBERS_URL, {
+    const response = await fetch(MAILERLITE_SUBSCRIBERS_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,9 +57,9 @@ export default async function handler(req, res) {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      console.error('Sender API error', response.status, result);
+      console.error('MailerLite API error', response.status, result);
       return res.status(response.status >= 500 ? 502 : 400).json({
-        error: result?.message || result?.error || 'Subscription failed',
+        error: result?.message || result?.errors?.[0]?.message || result?.error || 'Subscription failed',
       });
     }
 

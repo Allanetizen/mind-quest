@@ -19,7 +19,7 @@ export function PixelCard({ children, color = 'light', className = '', interacti
 
   return (
     <div 
-      className={`border-4 ${colorClasses[color]} backdrop-blur-sm ${interactiveClasses} ${className}`}
+      className={`border-4 overflow-hidden ${colorClasses[color]} backdrop-blur-sm ${interactiveClasses} ${className}`}
       style={{ imageRendering: 'pixelated' }}
       onClick={onClick}
     >

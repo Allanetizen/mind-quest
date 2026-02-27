@@ -1,23 +1,11 @@
 import logo from '../../assets/logo.png';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { PixelCard } from '../components/PixelCard';
+import { QUIZ_PATH } from '../routes';
 import { GameElement } from '../components/GameElement';
 import { motion } from 'motion/react';
 import { trackEvent } from '../utils/analytics';
-
-const SENDER_ACCOUNT_ID = '384d9197486881';
-const SENDER_FORM_ID = 'dR6JzL';
-const SENDER_SCRIPT_BASE = 'https://cdn.sender.net/accounts_resources/universal.js';
-
-declare global {
-  interface Window {
-    sender?: ((...args: unknown[]) => void) & { q?: unknown[]; l?: number };
-    senderFormsLoaded?: boolean;
-    senderForms?: { render: (forms: string | string[], config?: { onRender?: (formId: string) => void }) => void };
-    onSenderReady?: () => void;
-  }
-}
 
 const SUBSCRIBE_API = import.meta.env.VITE_SUBSCRIBE_API_URL || '/api/subscribe';
 
@@ -28,59 +16,6 @@ export function Landing() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const win = window;
-
-    if (!win.sender) {
-      win.sender = function (...args: unknown[]) {
-        const fn = win.sender;
-        if (fn) {
-          fn.q = fn.q || [];
-          fn.q.push(args);
-        }
-      };
-      win.sender.l = 1 * new Date();
-    }
-
-    const renderForm = () => {
-      if (win.senderForms && typeof win.senderForms.render === 'function') {
-        win.senderForms.render([SENDER_FORM_ID], {
-          onRender() {
-            // Form is now in the DOM and can collect email
-          },
-        });
-      }
-    };
-
-    win.onSenderReady = () => {
-      if (typeof win.sender === 'function') {
-        win.sender(SENDER_ACCOUNT_ID);
-      }
-      if (win.senderFormsLoaded) {
-        renderForm();
-      } else {
-        window.addEventListener('onSenderFormsLoaded', renderForm);
-      }
-    };
-
-    const scriptUrl = `${SENDER_SCRIPT_BASE}?explicit=true&onload=onSenderReady`;
-    const existing = document.querySelector(`script[src*="${SENDER_SCRIPT_BASE}"]`);
-
-    if (!existing) {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = scriptUrl;
-      const first = document.getElementsByTagName('script')[0];
-      (first?.parentNode || document.head).appendChild(script);
-    } else if (win.onSenderReady) {
-      win.onSenderReady();
-    }
-
-    return () => {
-      window.removeEventListener('onSenderFormsLoaded', renderForm);
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-[#DDD6F3] relative overflow-hidden">
@@ -121,19 +56,22 @@ export function Landing() {
             Guided reflections. Zero stress.
           </motion.p>
 
-          {/* Email form – main entrance */}
+          {/* Email form – main entrance, built within box */}
           <motion.div
-            className="w-full"
+            className="w-full max-w-md mx-auto min-w-0"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <PixelCard color="gradient" className="p-6 md:p-8 text-center">
-              <p className="text-[#553C9A] pixel-font text-sm md:text-base mb-4">
-                Enter your email to begin ✨
-              </p>
+            <PixelCard color="gradient" className="p-6 md:p-8 text-center min-w-0">
+              <div className="min-w-0">
+                <p className="text-[#553C9A] pixel-font text-sm md:text-base mb-4 break-words">
+                  Enter your email to begin ✨
+                </p>
+              </div>
               {!submitted ? (
                 <form
+                  className="flex flex-col gap-3 items-center min-w-0 w-full"
                   onSubmit={async (e) => {
                     e.preventDefault();
                     setError(null);
@@ -159,44 +97,47 @@ export function Landing() {
                       }
                       trackEvent('email_submitted');
                       setSubmitted(true);
-                      navigate('/quiz', { state: { email: emailValue } });
+                      navigate(QUIZ_PATH, { state: { email: emailValue } });
                     } catch {
                       setError('Connection error. Try again.');
                     }
                     setLoading(false);
                   }}
-                  className="flex flex-col gap-3 items-center"
                 >
-                  <input
-                    type="text"
-                    value={firstname}
-                    onChange={(e) => { setFirstname(e.target.value); setError(null); }}
-                    placeholder="First name (optional)"
-                    disabled={loading}
-                    className="w-full max-w-sm px-4 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font text-sm disabled:opacity-70"
-                  />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                    placeholder="your.email@example.com"
-                    required
-                    disabled={loading}
-                    className="w-full max-w-sm px-4 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font text-sm disabled:opacity-70"
-                  />
+                  <div className="w-full max-w-sm min-w-0 flex flex-col items-center">
+                    <input
+                      type="text"
+                      value={firstname}
+                      onChange={(e) => { setFirstname(e.target.value); setError(null); }}
+                      placeholder="First name (optional)"
+                      disabled={loading}
+                      className="w-full box-border px-4 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font text-sm disabled:opacity-70 min-w-0"
+                    />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                      placeholder="your.email@example.com"
+                      required
+                      disabled={loading}
+                      className="w-full box-border px-4 py-3 border-4 border-[#9F7AEA] bg-white text-[#553C9A] placeholder:text-[#B794F6] focus:outline-none focus:border-[#6B46C1] pixel-font text-sm disabled:opacity-70 min-w-0"
+                    />
+                  </div>
                   {error && (
-                    <p className="text-red-600 text-xs pixel-font">{error}</p>
+                    <p className="text-red-600 text-xs pixel-font break-words text-center max-w-sm w-full">{error}</p>
                   )}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="px-6 py-2 bg-[#6B46C1] hover:bg-[#553C9A] text-white border-2 border-[#553C9A] pixel-font text-xs transition-colors disabled:opacity-70"
-                  >
-                    {loading ? 'Sending…' : 'Start your quest →'}
-                  </button>
-                  <p className="text-[#9F7AEA] text-[10px] leading-tight max-w-xs">
-                    By signing up you agree to receive MindQuest updates and newsletters.
-                  </p>
+                  <div className="w-full flex flex-col items-center min-w-0">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-6 py-2 bg-[#6B46C1] hover:bg-[#553C9A] text-white border-2 border-[#553C9A] pixel-font text-xs transition-colors disabled:opacity-70 shrink-0"
+                    >
+                      {loading ? 'Sending…' : 'Start your quest →'}
+                    </button>
+                    <p className="text-[#9F7AEA] text-[10px] leading-tight max-w-xs mt-2 break-words text-center px-1">
+                      By signing up you agree to receive MindQuest updates and newsletters.
+                    </p>
+                  </div>
                 </form>
               ) : (
                 <p className="text-[#553C9A] pixel-font text-sm mb-2">You’re in! ✨</p>
@@ -206,44 +147,31 @@ export function Landing() {
                   Then take a short quiz to find your companion.
                 </p>
               )}
-              <div
-                className="sender-form-field sender-embed landing-sender-form hidden"
-                style={{ textAlign: 'left' }}
-                data-sender-form-id={SENDER_FORM_ID}
-                aria-hidden="true"
-              />
             </PixelCard>
+            <p className="mt-3 text-center">
+              <Link to={QUIZ_PATH} className="text-[#9F7AEA] hover:text-[#6B46C1] pixel-font text-xs underline">
+                Or take the quiz first (shareable link)
+              </Link>
+            </p>
           </motion.div>
 
-          {/* Game elements */}
-          <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-2xl mt-12 mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-            >
+          {/* Game elements – each card built within its own box */}
+          <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-2xl mt-12 mb-12 min-w-0">
+            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
               <GameElement
                 emoji="🎯"
                 label="Daily Quest"
                 value="2 min"
               />
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-            >
+            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
               <GameElement
                 emoji="🔥"
                 label="Streak"
                 value="7 days"
               />
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0 }}
-            >
+            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }}>
               <GameElement
                 emoji="✨"
                 label="Insights"

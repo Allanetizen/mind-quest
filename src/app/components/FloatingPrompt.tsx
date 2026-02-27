@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 
 interface FloatingPromptProps {
@@ -6,6 +7,7 @@ interface FloatingPromptProps {
 }
 
 export function FloatingPrompt({ text, delay = 0 }: FloatingPromptProps) {
+  const [left] = useState(() => `${20 + Math.random() * 60}%`);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,7 +20,7 @@ export function FloatingPrompt({ text, delay = 0 }: FloatingPromptProps) {
       }}
       className="absolute text-sm text-[#9F7AEA] pointer-events-none"
       style={{
-        left: `${20 + Math.random() * 60}%`,
+        left,
         top: '50%'
       }}
     >

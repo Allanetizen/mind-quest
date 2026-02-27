@@ -1,7 +1,7 @@
 /**
  * Local dev server for POST /api/subscribe (same logic as api/subscribe.js).
  * Run: npm run dev:api (in one terminal), then npm run dev (in another).
- * Requires .env with SENDER_API_TOKEN.
+ * Requires .env with SUBSS (MailerLite API token).
  */
 
 import http from 'http';
@@ -25,7 +25,8 @@ try {
   });
 } catch {}
 
-const SENDER_SUBSCRIBERS_URL = 'https://api.sender.net/v2/subscribers';
+const MAILERLITE_SUBSCRIBERS_URL = 'https://connect.mailerlite.com/api/subscribers';
+const DEFAULT_GROUP_ID = '180587122481170115';
 const PORT = 3001;
 
 async function handleSubscribe(req, res) {
@@ -35,7 +36,7 @@ async function handleSubscribe(req, res) {
     return;
   }
 
-  const token = process.env.SENDER_API_TOKEN;
+  const token = process.env.SUBSS;
   if (!token) {
     res.writeHead(500, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Server configuration error' }));
@@ -59,16 +60,15 @@ async function handleSubscribe(req, res) {
   }
 
   const firstname = body.firstname ? String(body.firstname).trim() : undefined;
-  const groupId = process.env.SENDER_GROUP_ID || null;
+  const groupId = process.env.MAILERLITE_GROUP_ID || DEFAULT_GROUP_ID;
   const data = {
     email,
-    ...(firstname && { firstname }),
-    ...(groupId && { groups: [groupId] }),
-    trigger_automation: body.trigger_automation !== false,
+    ...(firstname && { fields: { name: firstname } }),
+    groups: [groupId],
   };
 
   try {
-    const response = await fetch(SENDER_SUBSCRIBERS_URL, {
+    const response = await fetch(MAILERLITE_SUBSCRIBERS_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -80,8 +80,9 @@ async function handleSubscribe(req, res) {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
+      const errMsg = result?.message || result?.errors?.[0]?.message || result?.error || 'Subscription failed';
       res.writeHead(response.status >= 500 ? 502 : 400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: result?.message || result?.error || 'Subscription failed' }));
+      res.end(JSON.stringify({ error: errMsg }));
       return;
     }
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -109,5 +110,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Dev API running at http://localhost:${PORT} (POST /api/subscribe)`);
+  console.log(`Dev API running at http://localhost:${PORT} (POST /api/subscribe, MailerLite)`);
 });
