@@ -99,16 +99,53 @@ const COMPANIONS = [
     description: 'Spark inspires creativity and fun exploration. She turns reflection into play.',
     gentlePrompt: 'What would feel like play instead of work right now?',
   },
+  {
+    id: 'rabbit',
+    name: 'The Tender Rabbit',
+    emoji: '🐇',
+    personality: 'Sensitive & Gentle',
+    traits: 'Sensitive • Overwhelmed • Gentle',
+    description: "You're feeling things deeply, and the world feels a bit loud. Rabbits know when to retreat and protect their soft hearts. Move slowly.",
+    gentlePrompt: 'What would help you feel just 10% safer or calmer right now?',
+  },
+  {
+    id: 'bear',
+    name: 'Bear',
+    emoji: '🐻',
+    personality: 'Cozy & Grounded',
+    traits: 'Restful • Nurturing • Steady',
+    description: 'Bear reminds you that rest is not laziness. Sometimes the bravest thing is to slow down and recharge.',
+    gentlePrompt: "What's one small way you could be gentler with yourself today?",
+  },
+  {
+    id: 'turtle',
+    name: 'Turtle',
+    emoji: '🐢',
+    personality: 'Steady & Patient',
+    traits: 'Patient • Thoughtful • Steady',
+    description: "Turtle takes things one step at a time. When you feel drained, she's your reminder that slow progress is still progress.",
+    gentlePrompt: "What's one tiny step you could take without pushing yourself?",
+  },
+  {
+    id: 'fox',
+    name: 'Fox',
+    emoji: '🦊',
+    personality: 'Curious & Adaptable',
+    traits: 'Curious • Adaptable • Playful',
+    description: "Fox goes with the flow and finds wonder in the in-between. She's your companion when your mind is jumping and that's okay.",
+    gentlePrompt: 'What would feel like curiosity instead of pressure right now?',
+  },
 ];
 
 function getAssignedCompanion(answers: string[]): (typeof COMPANIONS)[0] {
-  const counts: Record<string, number> = Object.fromEntries(COMPANIONS.map((c) => [c.id, 0]));
+  const allPetIds = [...new Set(QUESTIONS.flatMap((q) => q.options.map((o) => o.pet)))];
+  const counts: Record<string, number> = Object.fromEntries(allPetIds.map((id) => [id, 0]));
   QUESTIONS.forEach((q, i) => {
     const chosen = q.options.find((o) => o.value === answers[i]);
-    if (chosen) counts[chosen.pet]++;
+    if (chosen) counts[chosen.pet] = (counts[chosen.pet] ?? 0) + 1;
   });
   const max = Math.max(...Object.values(counts));
-  const id = (Object.entries(counts).find(([, c]) => c === max) ?? [COMPANIONS[0].id])[0];
+  const id = (Object.entries(counts).find(([, c]) => c === max) ?? [allPetIds[0]])[0];
   return COMPANIONS.find((c) => c.id === id) ?? COMPANIONS[0];
 }
 
@@ -293,8 +330,9 @@ export function Quiz() {
                 <p className="text-[#6B46C1] text-sm mb-6">{result.description}</p>
 
                 <div className="bg-[#FAF5FF] border-4 border-[#E9D8FD] rounded p-4 mb-6 text-left">
-                  <p className="text-[#553C9A] pixel-font text-xs mb-2">✨ Gentle prompt</p>
-                  <p className="text-[#6B46C1] text-sm">{result.gentlePrompt}</p>
+                  <p className="text-[#553C9A] pixel-font text-xs mb-2">One prompt for you</p>
+                  <p className="text-[#6B46C1] text-sm italic">Based on how you're feeling, try this:</p>
+                  <p className="text-[#553C9A] pixel-font text-sm mt-2">{result.gentlePrompt}</p>
                 </div>
 
                 <Link
