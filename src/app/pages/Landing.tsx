@@ -71,12 +71,25 @@ export function Landing() {
             </PixelCard>
           </motion.div>
 
+          {/* Feature cards – above CTA */}
+          <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-2xl mb-8 min-w-0">
+            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+              <GameElement emoji="🎯" label="Daily Quest" value="2 min" />
+            </motion.div>
+            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+              <GameElement emoji="🔥" label="Streak" value="7 days" />
+            </motion.div>
+            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+              <GameElement emoji="✨" label="Insights" value="AI-guided" />
+            </motion.div>
+          </div>
+
           {/* Start your quest → quiz */}
           <motion.div
-            className="w-full max-w-md mx-auto min-w-0"
+            className="w-full max-w-md mx-auto min-w-0 mb-12"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
+            transition={{ delay: 0.8 }}
           >
             <PixelCard color="gradient" className="p-6 md:p-8 text-center min-w-0">
               <p className="text-[#553C9A] pixel-font text-sm mb-5">
@@ -91,18 +104,6 @@ export function Landing() {
               </Link>
             </PixelCard>
           </motion.div>
-
-          <div className="grid grid-cols-3 gap-4 md:gap-6 w-full max-w-2xl mt-12 mb-12 min-w-0">
-            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-              <GameElement emoji="🎯" label="Daily Quest" value="2 min" />
-            </motion.div>
-            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
-              <GameElement emoji="🔥" label="Streak" value="7 days" />
-            </motion.div>
-            <motion.div className="min-w-0 overflow-hidden" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
-              <GameElement emoji="✨" label="Insights" value="AI-guided" />
-            </motion.div>
-          </div>
         </section>
 
         <section className="px-6 py-12 md:py-16 max-w-4xl mx-auto">
