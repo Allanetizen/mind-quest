@@ -186,5 +186,10 @@
 }
 
 @layer components {
-  /* MailerLite subscription uses custom form in Landing; no embed styles needed */
+  /* Gumroad overlay checkout – match MindQuest purple; Gumroad may inject extra rules */
+  a.mindquest-gumroad.gumroad-button {
+    box-sizing: border-box;
+    text-decoration: none;
+    display: block;
+  }
 }
